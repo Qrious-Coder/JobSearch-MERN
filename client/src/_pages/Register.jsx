@@ -10,7 +10,7 @@ const initState = {
   username: '',
   email:'',
   pw:'',
-  isMember: true,
+  isMember: false,
 }
 
 const Register = () => {
@@ -22,9 +22,12 @@ const Register = () => {
   const { email, pw, isMember, username} = formData
   useEffect(() => {
     if(user){
-      navigate('/')
+      setTimeout(() => {
+        navigate('/')
+      }, 1000);
     }
   },[navigate, user])
+
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value})
   }
@@ -110,7 +113,7 @@ const Register = () => {
           </button>
           <p>
             <span>
-              { isMember ?
+              { !isMember ?
               'Not a member yet? ':
               'Already a member? ' 
               }
@@ -119,7 +122,7 @@ const Register = () => {
               className='member-btn'
               onClick={ toggleForm }
               >
-              { isMember ? 'Register' : 'Login'}
+              { !isMember ? 'Register' : 'Login'}
             </span>
           </p>
         </form>

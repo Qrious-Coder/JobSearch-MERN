@@ -1,7 +1,7 @@
 import Job from '../models/Job.js'
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError, NotFoundError } from '../errors/index.js'
-import {checkAuth} from "../utils/checkAuth.js";
+import { checkAuth } from "../utils/checkAuth.js";
 import mongoose from "mongoose"
 import moment from "moment"
 
@@ -58,11 +58,11 @@ const getAllJobs = async (req, res) => {
   const page = req.query.page || 1
   const limit = req.query.limit || 10
   const skip = (page-1) * limit
-  result = result.skip(skip).limit(limit)
 
   const total = await Job.countDocuments(queryObject)
   const numOfPages = Math.ceil(total/limit)
 
+  result = result.skip(skip).limit(limit)
   const jobs = await result
   res.status(StatusCodes.OK).json({ jobs,
     total,
@@ -71,25 +71,25 @@ const getAllJobs = async (req, res) => {
 }
 
 const updateJob = async (req, res) => {
-  const { id: jobId} = req.params
   const { position, company } = req.body
   if( !position || !company ) {
     throw new BadRequestError('Please provide all input!')
   }
+
+  const { id: jobId } = req.params
   const jobFoundById = await Job.findOne({ _id: jobId })
 
   if( !jobFoundById ){
     throw new NotFoundError(`No job found with ID ${ jobId }`)
   }
   //Authorized access
-  checkAuth( req.user.userId, jobFoundById.createdBy )
-
+  checkAuth( req.user, jobFoundById.createdBy )
   const jobUpdated = await Job.findOneAndUpdate({ _id: jobId},
     req.body,
     {
       new: true,
       runValidators: true,
-      returnNewDocument: true, returnDocument: "after"
+      returnNewDocument: true, returnDocument: "after" //CHECK IF NECESSARY
     }
   )
 
@@ -100,11 +100,12 @@ const deleteJob = async (req, res) => {
   const { id: jobId } = req.params
   const jobFoundById = await Job.findOne({ _id: jobId })
 
+  checkAuth( req.user, jobFoundById.createdBy ) 
   if( !jobFoundById ) {
     throw new NotFoundError(`Job ID ${ jobId } does not exist!`)
   }
 
-  checkAuth( req.user.userId, jobFoundById.createdBy)
+ 
 
   await jobFoundById.remove()
   res.status(StatusCodes.OK).json({ msg: `${ jobFoundById.position } is deleted!`})
@@ -155,7 +156,8 @@ const showStats = async (req, res) => {
       .year( year )
       .format('MMM Y')
     return { date, count}
-  })
+  }).reverse() //Check: add reverse() works?
+  
   res.status(StatusCodes.OK).json({ defaultStats, monthlyApplications  });
 };
 

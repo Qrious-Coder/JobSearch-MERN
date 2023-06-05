@@ -23,9 +23,10 @@ const register = async (req, res) => {
       name: user.name,
       lastName: user.lastName,
       email: user.email,
+      // location: user.location //Check: what's the use of adding location here?
     } , 
     // token,
-    location: user.location
+    location: user.location // Check: userLocation: user.location
    })
 }
 
@@ -51,17 +52,20 @@ const login = async (req, res) => {
   }
 
   const token = user.createJWT()
-  //hide pw
-  user.password = undefined
+ 
   attachCookie({ res, token })
-  res.status(StatusCodes.OK).json(
+   //hide pw
+  user.password = undefined
+  res.status(StatusCodes.CREATED).json(
   { user,
     // token,
-    location: user.location
+    location: user.location // Check: userLocation: user.location
   })
 }
 
 const updateUser = async (req, res) => {
+  const { userId} = req.user
+  console.log(`@ =====> userId`, userId)
   const { name, lastName, email, location } = req.body
   console.log('check isTester', req.user)
 
@@ -70,7 +74,7 @@ const updateUser = async (req, res) => {
   }
   
   //find the user with id
-  const user = await User.findOne({ _id: req.user.userId })
+  const user = await User.findOne({ _id: userId })
 
   //then update
   user.name = name
@@ -78,21 +82,22 @@ const updateUser = async (req, res) => {
   user.email = email
   user.location = location
 
+ 
+  const token = user.createJWT()
   await user.save()
   //optional : create new token after updating user
-  const token = user.createJWT()
   attachCookie({ res, token })
   res.status(StatusCodes.OK).json({
     user,
     // token,
-    location: user.location
+    location: user.location // Check: userLocation: user.location
   })
 }
 
 //Fetch data after page refreshed
 const getCurrentUser = async( req, res) => {
   const user = await User.findOne({ _id: req.user.userId });
-  res.status(StatusCodes.OK).json({ user, location: user.location })
+  res.status(StatusCodes.OK).json({ user, location: user.location }) // Check: userLocation: user.location
 }
 
 const logout = async( req, res ) => {

@@ -13,7 +13,7 @@ const Profile = () => {
     username: name || '',
     lastName: lastName || '',
     email: email || '',
-    location: location
+    location: location || ''
   })
 
   const handleChange = (e) => {
@@ -30,7 +30,7 @@ const Profile = () => {
       return
     }
     const currentUser = { username, lastName , email, location }
-    dispatch(updateUser(currentUser))
+    dispatch(updateUser(currentUser)) 
   }
 
   return (

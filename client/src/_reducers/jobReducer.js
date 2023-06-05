@@ -32,7 +32,7 @@ export const jobReducer = ( state = initState, action ) => {
   switch(action.type){
     case jobActions.HANDLE_INPUT_CHANGE:
       return { ...state ,
-        //searchInput: page reset 1
+        //pagination reset 1
         page: 1,
         [action.payload.name] : action.payload.value }
 
@@ -65,7 +65,7 @@ export const jobReducer = ( state = initState, action ) => {
       return {
         ...state,
         isEdit: true,
-        editJobId: _id,
+        editJobId: _id, //Check if I use editJobId correctly
         position,
         company,
         jobLocation,

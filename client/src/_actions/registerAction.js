@@ -21,7 +21,7 @@ export const setupUser = ({currentUser, endpoint, alertText }) => async(dispatch
     // addUserToLocalStorage({ user, token, location })
   } catch(err) {
     const { msg } = err?.response?.data.defaultError
-    console.log(`@ ===> /api/v1${ endpoint }==>err.res`, err?.response)
+    console.log(`@ ===> /api/v1${ endpoint }==>err.res`, err?.response.msg)
     dispatch(hasLoaded())
     dispatch(displayAlert({
       alertText: msg,
@@ -33,7 +33,7 @@ export const setupUser = ({currentUser, endpoint, alertText }) => async(dispatch
 export const logOutUser = () => async(dispatch) => {
   //** remove token at cookie
   await baseApi.get('/auth/logout')
-  dispatch({type: registerActions.LOGOUT_USER })
+  dispatch({ type: registerActions.LOGOUT_USER })
   // removeFromLocalStorage()
 }
 
@@ -41,14 +41,14 @@ export const updateUser = (currentUser)=> async(dispatch) => {
   dispatch(isLoading())
   try {
     const res = await baseApi.patch(`/auth/updateUser`, currentUser)
-    console.log(`@ ===> /api/v1/auth/updateUser ==>res.data`, res)
+    console.log(`@ ===> /api/v1/auth/updateUser ==>res.data`, res.data)
     const { user, location } = res.data
     dispatch(hasLoaded())
     dispatch({
       type: registerActions.UPDATE_USER_SUCCESS,
       payload: {
         user,
-        location,
+        location, //Check: userLocation
       }
     })
     dispatch(displayAlert({
@@ -57,9 +57,15 @@ export const updateUser = (currentUser)=> async(dispatch) => {
     }))
     // addUserToLocalStorage( { user, token, location } )
   } catch(err) {
-    console.log(`@ ===> /api/v1/auth/updateUser ==>err.res`, err)
+    console.log(`@ ===> /api/v1/auth/updateUser ==>err.res`, err?.response?.data.defaultError)
     const { msg } = err?.response?.data.defaultError
     dispatch(hasLoaded())
+
+    //Check in the other code: I don't check 401 here
+    // dispatch(displayAlert({
+    //   alertText: msg,
+    //   alertType: 'error'
+    // }))
     if( err?.response.status !== 401 ) {
       dispatch(displayAlert({
         alertText: msg,
@@ -77,14 +83,15 @@ export const getCurrentUser = () => async( dispatch ) => {
   })
   try{
     const res = await baseApi.get(`/auth/getCurrentUser`)
-    console.log(`@ ===> /api/v1//auth/getCurrentUser ==>res.data`, res)
-    const {user, location } = res?.data
+    console.log(`@ ===> /api/v1//auth/getCurrentUser ==>res.data`, res.data)
+    const { user, location } = res?.data //Check: userLocation?
     dispatch({
       type: registerActions.GET_CURRENT_USER_SUCCESS,
       payload: { user, location }
     })
   } catch(err) {
-    if(err.response.status !== 401) return
+    console.log(`@ ===> /api/v1//auth/getCurrentUser ==> err.res`, err.response)
+    if(err.response.status !== 401) return //Check: remove?
     dispatch(logOutUser())
   }
 }

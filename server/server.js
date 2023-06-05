@@ -24,7 +24,9 @@ import errorHandlerMiddleware from './middleware/error-handler.js'
 import authenticateUser from './middleware/auth.js'
 
 import morgan from 'morgan'
-app.use(morgan('dev'))
+if( process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'))
+}
 
 /* cors replace by proxy */
 // app.use(cors())

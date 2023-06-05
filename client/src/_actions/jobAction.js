@@ -16,7 +16,7 @@ export const clearAllInput = () => async( dispatch )=> {
   })
 }
 
-export const createJob = ({ currentJob }) => async( dispatch ) => {
+export const createJob = (currentJob) => async( dispatch ) => {
   dispatch(isLoading())
   try{
     const res = await baseApi.post('/jobs', currentJob)

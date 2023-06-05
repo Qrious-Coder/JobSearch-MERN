@@ -25,11 +25,11 @@ const AddJob = () => {
         alertType: 'error'}))
       return
     }
-    const currentJob = { position, company, jobLocation, jobType, status}
+    const currentJob = { position, company, jobLocation, jobType, status }
     if( isEdit) {
       return dispatch(editJob({ _id: editJobId, currentJob }))
     } else {
-      return dispatch(createJob({ currentJob } ))
+      return dispatch(createJob(currentJob))
     }
   }
 
